@@ -1,0 +1,51 @@
+body{
+font-family: Arial;
+background:#f4f4f4;
+margin:0;
+}
+
+header{
+background:#222;
+color:white;
+padding:20px;
+text-align:center;
+}
+
+button{
+padding:10px 15px;
+background:#6c63ff;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+.charts{
+display:flex;
+gap:20px;
+padding:20px;
+}
+
+.charts div{
+background:white;
+padding:15px;
+border-radius:10px;
+width:50%;
+}
+
+#articles{
+padding:20px;
+}
+
+.card{
+background:white;
+padding:15px;
+border-radius:8px;
+margin-bottom:10px;
+}
+
+.card a{
+text-decoration:none;
+font-weight:bold;
+color:black;
+}
