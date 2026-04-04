@@ -1,4 +1,4 @@
-const API = "http://localhost:8000"
+const API = "https://news-bias-api-vv2o.onrender.com"
 
 let biasChart
 let sentimentChart
