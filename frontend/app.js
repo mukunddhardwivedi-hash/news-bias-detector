@@ -24,13 +24,21 @@ data.forEach(a=>{
 biasCount[a.bias]++
 sentimentCount[a.sentiment]++
 
-container.innerHTML+=`
+container.innerHTML += `
 <div class="card">
-<a href="${a.url}" target="_blank">${a.title}</a>
-<br>
+
+<a href="${a.url}" target="_blank">
+${a.title}
+</a>
+
+<p>${a.summary}</p>
+
 <small>${a.source}</small>
+
 <br>
+
 Bias: ${a.bias} | Sentiment: ${a.sentiment}
+
 </div>
 `
 })

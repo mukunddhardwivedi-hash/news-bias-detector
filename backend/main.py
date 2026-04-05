@@ -1,57 +1,52 @@
-from fastapi import FastAPI, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from database import get_db, Article, Base, engine
-from fetcher import fetch_all
-from analyzer import analyze_sentiment
-
-Base.metadata.create_all(bind=engine)
-
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.get("/")
-def root():
-    return {"status": "News Bias API running"}
-
 @app.post("/fetch")
 def fetch_and_store(db: Session = Depends(get_db)):
     articles = fetch_all()
     added = 0
 
     for a in articles:
+        # 1. Check if it already exists to avoid duplicate heavy processing
         exists = db.query(Article).filter_by(url=a["url"]).first()
 
         if exists or not a["title"] or not a["url"]:
             continue
 
-        sentiment, score = analyze_sentiment(a["title"])
+        try:
+            # 2. Extract full text content from the URL
+            content = extract_article(a["url"])
+            
+            # 3. Generate summary and analyze sentiment based on the full CONTENT
+            # (Note: Ensure analyze_sentiment handles long text or truncates it)
+            summary = summarize(content)
+            sentiment, score = analyze_sentiment(content)
 
-        article = Article(
-            title=a["title"],
-            source=a["source"],
-            url=a["url"],
-            published=a["published"],
-            bias=a["bias"],
-            sentiment=sentiment,
-            sentiment_score=score,
-        )
+            # 4. Create the Database object
+            article = Article(
+                title=a["title"],
+                source=a["source"],
+                url=a["url"],
+                published=a.get("published"),
+                content=content,
+                summary=summary,
+                bias=a["bias"],
+                sentiment=sentiment,
+                sentiment_score=score,
+            )
 
-        db.add(article)
-        added += 1
+            db.add(article)
+            added += 1
+            
+        except Exception as e:
+            print(f"Error processing article {a['url']}: {e}")
+            continue
 
+    # Commit all new entries at once
     db.commit()
 
     return {"added": added}
 
 @app.get("/articles")
 def get_articles(db: Session = Depends(get_db)):
+
     articles = db.query(Article).all()
 
     return [
@@ -59,6 +54,7 @@ def get_articles(db: Session = Depends(get_db)):
             "title": a.title,
             "source": a.source,
             "url": a.url,
+            "summary": a.summary,
             "bias": a.bias,
             "sentiment": a.sentiment,
         }
