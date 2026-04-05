@@ -1,9 +1,8 @@
 fastapi
 uvicorn
-feedparser
-requests
-transformers
-torch
-vaderSentiment
-python-dotenv
 sqlalchemy
+feedparser
+newspaper3k
+transformers
+sentencepiece
+lxml_html_clean
