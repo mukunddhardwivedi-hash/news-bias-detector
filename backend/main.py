@@ -1,3 +1,13 @@
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+
+from database import get_db
+from models import Article
+from fetch_news import fetch_all
+from ai_models import analyze_sentiment, summarize
+from article_extractor import extract_article
+
+app = FastAPI()
 @app.post("/fetch")
 def fetch_and_store(db: Session = Depends(get_db)):
     articles = fetch_all()
